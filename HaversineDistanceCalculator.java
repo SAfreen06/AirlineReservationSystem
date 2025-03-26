@@ -1,20 +1,31 @@
 public class HaversineDistanceCalculator implements IDistanceCalculator {
     @Override
     public String[] calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        double theta = lon1 - lon2;
-        double distance = Math.sin(convertDegreesToRadians(lat1)) * Math.sin(convertDegreesToRadians(lat2))
-                + Math.cos(convertDegreesToRadians(lat1)) * Math.cos(convertDegreesToRadians(lat2))
-                * Math.cos(convertDegreesToRadians(theta));
-        distance = Math.acos(distance);
-        distance = convertRadiansToDegrees(distance);
-        distance = distance * 60 * 1.1515;
+            final double EARTH_RADIUS_MILES = 3958.8; // Radius of Earth in miles
+            final double EARTH_RADIUS_KM = 6371.0; // Radius of Earth in km
+            final double EARTH_RADIUS_NAUTICAL_MILES = 3440.1; // Radius in nautical miles
 
-        String[] distanceString = new String[3];
-        distanceString[0] = String.format("%.2f", distance * 0.8684);  // Miles
-        distanceString[1] = String.format("%.2f", distance * 1.609344);  // Kilometers
-        distanceString[2] = Double.toString(Math.round(distance * 100.0) / 100.0);  // Knots
-        return distanceString;
-    }
+            double latDistance = Math.toRadians(lat2 - lat1);
+            double lonDistance = Math.toRadians(lon2 - lon1);
+
+            double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                    + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                    * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            // Calculate distances in different units
+            double distanceMiles = EARTH_RADIUS_MILES * c;
+            double distanceKm = EARTH_RADIUS_KM * c;
+            double distanceNauticalMiles = EARTH_RADIUS_NAUTICAL_MILES * c;
+
+            // Format the results
+            return new String[]{
+                    String.format("%.2f", distanceMiles),
+                    String.format("%.2f", distanceKm),
+                    String.format("%.2f", distanceNauticalMiles)
+            };
+        }
 
     @Override
     public double convertDegreesToRadians(double degrees) {
