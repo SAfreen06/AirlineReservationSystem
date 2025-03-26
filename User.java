@@ -1,8 +1,3 @@
-/*
- * This class is intended to be the main class for this Project. All necessary methods are getting calls from this class.
- *
- *
- */
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +5,7 @@ import java.util.Scanner;
 
 public class User {
 
-    // ************************************************************ Fields
-    // ************************************************************
+    // ************************************************************ Fields ************************************************************
 
     /*
      * 2D Array to store admin credentials. Default credentials are stored on [0][0]
@@ -27,14 +21,19 @@ public class User {
     public static void main(String[] args) {
         int countNumOfUsers = 1;
         RolesAndPermissions r1 = new RolesAndPermissions();
-        Flight f1 = new Flight();
+
+        // Updated flight initialization
+        RandomGenerator randomGenerator = new RandomGenerator();
+        IDistanceCalculator distCalc = new HaversineDistanceCalculator();
+        IFlightTimeCalculator timeCalc = new FlightTimeCalculator();
+        Flight f1 = Flight.createFlight(distCalc, timeCalc, randomGenerator);
+        f1.generateFlightSchedule(5, randomGenerator);
+
         FlightReservation bookingAndReserving = new FlightReservation();
         Customer c1 = new Customer();
-        f1.flightScheduler();
-        CustomerService customerService=new CustomerService();
+        CustomerService customerService = new CustomerService();
         Scanner read = new Scanner(System.in);
 
-       
         System.out.println(
                 "\n\t\t\t\t\t+++++++++++++ Welcome to BAV AirLines +++++++++++++\n\nTo Further Proceed, Please enter a value.");
         System.out.println(
@@ -48,20 +47,12 @@ public class User {
 
         do {
             Scanner read1 = new Scanner(System.in);
-            /*
-             * If desiredOption is 1 then call the login method.... if default credentials
-             * are used then set the permission
-             * level to standard/default where the user can just view the customer's
-             * data...if not found, then return -1, and if
-             * data is found then show the user display menu for adding, updating, deleting
-             * and searching users/customers...
-             */
-            if (desiredOption == 1) {
 
-                /* Default username and password.... */
+            if (desiredOption == 1) {
+                // Default admin credentials
                 adminUserNameAndPassword[0][0] = "root";
                 adminUserNameAndPassword[0][1] = "root";
-                
+
                 System.out.print("\nEnter the UserName to login to the Management System :     ");
                 String username = read1.nextLine();
                 System.out.print("Enter the Password to login to the Management System :    ");
@@ -83,11 +74,6 @@ public class User {
                             "%-20sLogged in Successfully as \"%s\"..... For further Proceedings, enter a value from below....",
                             "", username);
 
-                    /*
-                     * Going to Display the CRUD operations to be performed by the privileged
-                     * user.....Which includes Creating, Updating
-                     * Reading(Searching) and deleting a customer....
-                     */
                     do {
                         System.out.printf("\n\n%-60s+++++++++ 2nd Layer Menu +++++++++%50sLogged in as \"%s\"\n", "",
                                 "", username);
@@ -104,44 +90,29 @@ public class User {
                         System.out.printf("%-30s (i) Enter 0 to Go back to the Main Menu/Logout....\n", "");
                         System.out.print("Enter the desired Choice :   ");
                         desiredOption = read.nextInt();
-                        /* If 1 is entered by the privileged user, then add a new customer...... */
+
                         if (desiredOption == 1) {
-                           Customer customer = readCustomerData();
+                            Customer customer = readCustomerData();
                             customerService.addNewCustomer(customer);
 
                         } else if (desiredOption == 2) {
-                            /*
-                             * If 2 is entered by the privileged user, then call the search method of the
-                             * Customer class
-                             */
-                            
                             customerService.displayCustomersData(false);
                             System.out.print("Enter the CustomerID to Search :\t");
                             String customerID = read1.nextLine();
                             System.out.println();
                             customerService.searchUser(customerID);
                         } else if (desiredOption == 3) {
-                            /*
-                             * If 3 is entered by the user, then call the update method of the Customer
-                             * Class with required
-                             * arguments.....
-                             */
-                            
                             customerService.displayCustomersData(false);
                             System.out.print("Enter the CustomerID to Update its Data :\t");
                             String customerID = read1.nextLine();
                             if (customersCollection.size() > 0) {
-                                List<String>details=readEditedCustomerInfo();
-                                customerService.editUserInfo(customerID,details);
+                                List<String>details = readEditedCustomerInfo();
+                                customerService.editUserInfo(customerID, details);
                             } else {
                                 System.out.printf("%-50sNo Customer with the ID %s Found...!!!\n", " ", customerID);
                             }
 
                         } else if (desiredOption == 4) {
-                            /*
-                             * If 4 is entered, then ask the user to enter the customer id, and then delete
-                             * that customer....
-                             */
                             customerService.displayCustomersData(false);
                             System.out.print("Enter the CustomerID to Delete its Data :\t");
                             String customerID = read1.nextLine();
@@ -151,7 +122,6 @@ public class User {
                                 System.out.printf("%-50sNo Customer with the ID %s Found...!!!\n", " ", customerID);
                             }
                         } else if (desiredOption == 5) {
-                            /* Call the Display Method of Customer Class.... */
                             customerService.displayCustomersData(false);
                         } else if (desiredOption == 6) {
                             customerService.displayCustomersData(false);
@@ -161,9 +131,7 @@ public class User {
                             bookingAndReserving.displayFlightsRegisteredByOneUser(id);
                         } else if (desiredOption == 7) {
                             System.out.print(
-                                    "Do you want to display Passengers of all flights or a specific flight.... 'Y/y' for displaying all flights and 'N/n' to look for a"
-                                            +
-                                            " specific flight.... ");
+                                    "Do you want to display Passengers of all flights or a specific flight.... 'Y/y' for displaying all flights and 'N/n' to look for a specific flight.... ");
                             char choice = read1.nextLine().charAt(0);
                             if ('y' == choice || 'Y' == choice) {
                                 bookingAndReserving.displayRegisteredUsersForAllFlight();
@@ -180,10 +148,9 @@ public class User {
                             f1.displayFlightSchedule();
                             System.out.print("Enter the Flight Number to delete the flight : ");
                             String flightNum = read1.nextLine();
-                            f1.deleteFlight(flightNum);
+                            //f1.deleteFlight(flightNum);
 
                         } else if (desiredOption == 0) {
-                            ;
                             System.out.println("Thanks for Using BAV Airlines Ticketing System...!!!");
 
                         } else {
@@ -197,10 +164,6 @@ public class User {
 
                 }
             } else if (desiredOption == 2) {
-                /*
-                 * If desiredOption is 2, then call the registration method to register a
-                 * user......
-                 */
                 System.out.print("\nEnter the UserName to Register :    ");
                 String username = read1.nextLine();
                 System.out.print("Enter the Password to Register :     ");
@@ -244,7 +207,6 @@ public class User {
                         System.out.print("Enter the desired Choice :   ");
                         desiredChoice = read.nextInt();
                         if (desiredChoice == 1) {
-                            // bookingAndReserving.displayArtWork(1);
                             f1.displayFlightSchedule();
                             System.out.print("\nEnter the desired flight number to book :\t ");
                             String flightToBeBooked = read1.nextLine();
@@ -257,8 +219,8 @@ public class User {
                             }
                             bookingAndReserving.bookFlight(flightToBeBooked, numOfTickets, result[1]);
                         } else if (desiredChoice == 2) {
-                            List<String>details=readEditedCustomerInfo();
-                            customerService.editUserInfo(result[1],details);
+                            List<String>details = readEditedCustomerInfo();
+                            customerService.editUserInfo(result[1], details);
                         } else if (desiredChoice == 3) {
                             System.out.print(
                                     "Are you sure to delete your account...It's an irreversible action...Enter Y/y to confirm...");
@@ -271,17 +233,13 @@ public class User {
                                 System.out.println("Action has been cancelled...");
                             }
                         } else if (desiredChoice == 4) {
-
                             f1.displayFlightSchedule();
-                            f1.displayMeasurementInstructions();
+                            MeasurementInstructions.displayMeasurementInstructions();
                         } else if (desiredChoice == 5) {
-
                             bookingAndReserving.cancelFlight(result[1]);
                         } else if (desiredChoice == 6) {
-
                             bookingAndReserving.displayFlightsRegisteredByOneUser(result[1]);
                         } else {
-
                             if (desiredChoice != 0) {
                                 System.out.println(
                                         "Invalid Choice...Looks like you're Robot...Entering values randomly...You've Have to login again...");
@@ -296,7 +254,7 @@ public class User {
                             "");
                 }
             } else if (desiredOption == 4) {
-                Customer customer=readCustomerData();
+                Customer customer = readCustomerData();
                 customerService.addNewCustomer(customer);
 
             } else if (desiredOption == 5) {
@@ -313,6 +271,7 @@ public class User {
 
     }
 
+    // Remaining methods stay the same as in the original implementation
     static void displayMainMenu() {
         System.out.println("\n\n\t\t(a) Press 0 to Exit.");
         System.out.println("\t\t(b) Press 1 to Login as admin.");
