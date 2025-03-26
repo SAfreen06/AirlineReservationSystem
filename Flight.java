@@ -1,8 +1,3 @@
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Flight implements IFlight {
@@ -82,6 +77,10 @@ public class Flight implements IFlight {
         this.flightTime = timeCalculator.calculateFlightTime(distanceInMiles);
     }
 
+    public static List<Flight> getFlightList() {
+        return flightList;
+    }
+
     // Method to generate flight schedule
     public void generateFlightSchedule(int numOfFlights, RandomGenerator randomGenerator) {
         IDistanceCalculator distCalc = new HaversineDistanceCalculator();
@@ -118,4 +117,10 @@ public class Flight implements IFlight {
     public int getNoOfSeats() { return numOfSeatsInTheFlight; }
     @Override
     public List<Customer> getRegisteredCustomers() { return registeredCustomers; }
+
+    public void setNoOfSeatsInTheFlight(int numOfSeatsInTheFlight) {
+        this.numOfSeatsInTheFlight = numOfSeatsInTheFlight;
+    }
+
+
 }
